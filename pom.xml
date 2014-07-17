@@ -86,7 +86,7 @@
     <dependency>
       <groupId>com.spotify</groupId>
       <artifactId>helios-service-registration</artifactId>
-      <version>0.0.31-SNAPSHOT</version>
+      <version>0.0.31</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -194,6 +194,35 @@
             <goals>
               <goal>shade</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>jdeb</artifactId>
+        <groupId>org.vafer</groupId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>helios-skydns-registrar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jdeb</goal>
+            </goals>
+            <configuration>
+              <deb>${project.build.directory}/helios-skydns-registrar_${project.version}_all.deb</deb>
+              <controlDir>${project.basedir}/src/deb</controlDir>
+              <dataSet>
+                <data>
+                  <src>${project.build.directory}/${project.build.finalName}.${project.packaging}</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/helios/lib/plugins</prefix>
+                    <filemode>755</filemode>
+                  </mapper>
+                </data>
+              </dataSet>
+            </configuration>
           </execution>
         </executions>
       </plugin>
