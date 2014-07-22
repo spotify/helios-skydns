@@ -1,4 +1,4 @@
-Package: helios-skydns-registrar
+Package: helios-skydns
 Version: [[project.version]]
 Section: non-free/net
 Priority: optional

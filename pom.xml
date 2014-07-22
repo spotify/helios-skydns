@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.spotify</groupId>
-  <artifactId>helios-skydns-registrar</artifactId>
+  <artifactId>helios-skydns</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>helios-skydns-registrar</name>
-  <url>https://github.com/spotify/helios-skydns-registrar</url>
+  <name>helios-skydns</name>
+  <url>https://github.com/spotify/helios-skydns</url>
 
   <licenses>
     <license>
@@ -58,9 +58,9 @@
 
   <scm>
     <connection>scm:git:https://github.com/spotify/helios.git</connection>
-    <developerConnection>scm:git:git@github.com:spotify/helios-skydns-registrar.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:spotify/helios-skydns.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://github.com/spotify/helios-skydns-registrar</url>
+    <url>https://github.com/spotify/helios-skydns</url>
   </scm>
 
   <properties>
@@ -208,13 +208,13 @@
         <version>1.0</version>
         <executions>
           <execution>
-            <id>helios-skydns-registrar</id>
+            <id>helios-skydns</id>
             <phase>package</phase>
             <goals>
               <goal>jdeb</goal>
             </goals>
             <configuration>
-              <deb>${project.build.directory}/helios-skydns-registrar_${project.version}_all.deb</deb>
+              <deb>${project.build.directory}/helios-skydns_${project.version}_all.deb</deb>
               <controlDir>${project.basedir}/src/deb</controlDir>
               <dataSet>
                 <data>
