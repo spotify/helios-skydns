@@ -45,11 +45,12 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class SkyDnsServiceRegistrarTest {
   private static final int WAIT_TIMEOUT = 1000;
-  private static final String PROTOCOL = "_http";
-  private static final String PORT_NAME = "_helios";
+  private static final String PROTOCOL = "http";
+  private static final String PORT_NAME = "helios";
   private static final String HOSTNAME = "myhostname.";
   private static final String DOMAIN = "services.foo.com";
-  private static final String ETCD_KEY = "com/foo/services/_http/_helios/myhostname._4242";
+  private static final String SUFFIX_KEY = "/myhostname__4242";
+  private static final String ETCD_KEY = "com/foo/services/http/helios" + SUFFIX_KEY;
   private static final String EXPECTED = createExpected();
   private static final int TTL = 3;
   final ImmutableList<Endpoint> ENDPOINTS = ImmutableList.of(
@@ -67,6 +68,20 @@ public class SkyDnsServiceRegistrarTest {
     } catch (JsonProcessingException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  @Test
+  public void testRegistration_alternateFormat() throws Exception {
+    // set some weird domain format
+    final SkyDnsServiceRegistrar registrar = new SkyDnsServiceRegistrar(client, TTL,
+        "${domain}.${service}");
+    final String key = "helios/com/foo/services" + SUFFIX_KEY;
+    when(client.set(key, EXPECTED, TTL))
+        .thenReturn(Futures.immediateFuture(response));
+    registrar.register(new ServiceRegistration(ImmutableList.of(
+        new ServiceRegistration.Endpoint(PORT_NAME, PROTOCOL, 4242, DOMAIN, HOSTNAME))));
+    verify(client, timeout(WAIT_TIMEOUT)).set(key, EXPECTED, TTL);
+    registrar.close();
   }
 
   @Test

@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.spotify</groupId>
-  <artifactId>helios-skydns-registrar</artifactId>
+  <artifactId>helios-skydns</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>helios-skydns-registrar</name>
-  <url>https://github.com/spotify/helios-skydns-registrar</url>
+  <name>helios-skydns</name>
+  <url>https://github.com/spotify/helios-skydns</url>
 
   <licenses>
     <license>
@@ -58,9 +58,9 @@
 
   <scm>
     <connection>scm:git:https://github.com/spotify/helios.git</connection>
-    <developerConnection>scm:git:git@github.com:spotify/helios-skydns-registrar.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:spotify/helios-skydns.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://github.com/spotify/helios-skydns-registrar</url>
+    <url>https://github.com/spotify/helios-skydns</url>
   </scm>
 
   <properties>
@@ -86,7 +86,7 @@
     <dependency>
       <groupId>com.spotify</groupId>
       <artifactId>helios-service-registration</artifactId>
-      <version>0.0.31-SNAPSHOT</version>
+      <version>0.0.31</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -94,6 +94,11 @@
       <artifactId>slf4j-api</artifactId>
       <version>1.7.6</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.3.2</version>
     </dependency>
     <dependency>
       <groupId>com.spotify</groupId>
@@ -194,6 +199,35 @@
             <goals>
               <goal>shade</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>jdeb</artifactId>
+        <groupId>org.vafer</groupId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>helios-skydns</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jdeb</goal>
+            </goals>
+            <configuration>
+              <deb>${project.build.directory}/helios-skydns_${project.version}_all.deb</deb>
+              <controlDir>${project.basedir}/src/deb</controlDir>
+              <dataSet>
+                <data>
+                  <src>${project.build.directory}/${project.build.finalName}.${project.packaging}</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/helios/lib/plugins</prefix>
+                    <filemode>755</filemode>
+                  </mapper>
+                </data>
+              </dataSet>
+            </configuration>
           </execution>
         </executions>
       </plugin>
