@@ -103,7 +103,7 @@
     <dependency>
       <groupId>com.spotify</groupId>
       <artifactId>helios-testing-common</artifactId>
-      <version>0.0.31-SNAPSHOT</version>
+      <version>0.0.31</version>
       <scope>test</scope>
     </dependency>
     <dependency>
