@@ -47,10 +47,10 @@ import static org.junit.Assert.assertTrue;
 
 public class UsingSkyDnsITCase {
   private static final int TTL = 300;
-  private static final String NORMAL_HOSTNAME_LOOKUP = "_spotify-helios._http.skydns.local";
+  private static final String NORMAL_HOSTNAME_LOOKUP = "helios.http.skydns.local";
   private static final String HOSTNAME = "myhostname.skydns.local";
   final ImmutableList<Endpoint> ENDPOINTS = ImmutableList.of(
-      new ServiceRegistration.Endpoint("_spotify-helios", "_http", 4242, "skydns.local", HOSTNAME));
+      new ServiceRegistration.Endpoint("helios", "http", 4242, "skydns.local", HOSTNAME));
 
   @Test
   public void test() throws Exception {

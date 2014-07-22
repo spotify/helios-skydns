@@ -22,9 +22,10 @@
 package com.spotify.helios.serviceregistration.skydns;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -37,6 +38,7 @@ import com.spotify.helios.serviceregistration.ServiceRegistration;
 import com.spotify.helios.serviceregistration.ServiceRegistration.Endpoint;
 import com.spotify.helios.serviceregistration.ServiceRegistrationHandle;
 
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,12 +83,24 @@ public class SkyDnsServiceRegistrar implements ServiceRegistrar {
     }
   };
 
+  private final String srvFormat;
+
+  public SkyDnsServiceRegistrar(final MiniEtcdClient etcdClient,
+                                final int timeToLiveSeconds) {
+    this(etcdClient, timeToLiveSeconds,
+        Optional
+            .fromNullable(System.getenv("REGISTRAR_HOST_FORMAT"))
+            .or("${service}.${protocol}.${domain}"));
+  }
+
   /**
    * @param etcdClient client to talk to etcd with.
    * @param timeToLiveSeconds how long entries in the discovery service should live.
+   * @param format the hostname format.
    */
   public SkyDnsServiceRegistrar(final MiniEtcdClient etcdClient,
-                                final int timeToLiveSeconds) {
+                                final int timeToLiveSeconds,
+                                final String format) {
     this.etcdClient = Preconditions.checkNotNull(etcdClient);
     this.timeToLiveSeconds = timeToLiveSeconds;
     this.handles = Maps.newConcurrentMap();
@@ -100,6 +114,7 @@ public class SkyDnsServiceRegistrar implements ServiceRegistrar {
     // registration
     this.executor.scheduleAtFixedRate(registrationRunnable, timeToLiveSeconds / 3,
         timeToLiveSeconds / 3, SECONDS);
+    this.srvFormat = format;
   }
 
   @Override
@@ -182,13 +197,15 @@ public class SkyDnsServiceRegistrar implements ServiceRegistrar {
     return Joiner.on('/').join(Lists.reverse(constituents));
   }
 
-  private static String makeKey(final Endpoint endpoint) {
-    final String uniqueSuffix = endpoint.getHost() + "_" + endpoint.getPort();
-    return Joiner.on("/").join(
-        ImmutableList.of(
-            pathifyDomain(endpoint.getDomain()),
-            endpoint.getProtocol(),
-            endpoint.getName(),
-            uniqueSuffix));
+  private String makeKey(final Endpoint endpoint) {
+    final StrSubstitutor subst = new StrSubstitutor(ImmutableMap.<String, Object>of(
+        "service", endpoint.getName(),
+        "protocol", endpoint.getProtocol(),
+        "domain", endpoint.getDomain()));
+
+    final String srvRecordName = subst.replace(srvFormat);
+    final String uniqueSuffix = (endpoint.getHost() + "_" + endpoint.getPort()).replace(".", "_");
+
+    return pathifyDomain(srvRecordName) + "/" + uniqueSuffix;
   }
 }
