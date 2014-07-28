@@ -54,6 +54,17 @@ If not, you'll need to do something akin to this, adjusting `$GOPATH` and the `1
 
 These above instructions should work on debian or ubuntu machines generally.  The `apt-get` lines should be the only thing to change on non-ubuntu machines.
 
+SRV Record Format
+-----------------
+
+By default it will register your jobs with the format
+service.protocol.domain, but this is overrideable via the
+`REGISTRAR_HOST_FORMAT` environment variable.  It is a
+`org.apache.commons.lang3.text.StrSubstitutor` format string.  So the
+actual default format is specified in the code as
+`${service}.${protocol}.${domain}`.  You can change this as you deem
+necessary.
+
 Findbugs
 --------
 
@@ -63,3 +74,19 @@ emitting reports in `target/site/findbugs.html`.
 
 To silence an irrelevant warning, add a filter match along with a justification
 in `findbugs-exclude.xml`.
+
+Test Drive
+----------
+A simple job definition to try things out with is:
+
+    helios create -p echo=4711 -r echo/text=echo echojob:1 busybox -- nc -p 4711 -lle cat
+
+It's a simple echo server, which you then can deploy and then you
+should be able to look it up in DNS (assuming your DNS infrastructure
+is set up properly) following the SRV record format.
+
+Debugging Things
+----------------
+Something I've found useful in debugging is dumping the contents of SkyDNS, or actually etcd.
+
+    curl -L http://youretcdhost:4001/v2/keys/skydns?recursive=true | jq -C . | less -r
