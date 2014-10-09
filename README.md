@@ -90,3 +90,12 @@ Debugging Things
 Something I've found useful in debugging is dumping the contents of SkyDNS, or actually etcd.
 
     curl -L http://youretcdhost:4001/v2/keys/skydns?recursive=true | jq -C . | less -r
+    
+Care And Feeding
+----------------
+Since crud may accumulate in the SkyDNS subtree of etcd, especially if using the Helios 
+Testing Framework, you may want to install [SkyGC](https://github.com/spotify/skygc) to 
+clean up the leftovers periodically.  But etcd can go on for a loooonng time before the 
+build up of trash will cause problems -- so much so that this was written because the 
+dumps (from the `curl` example above) got so long that it was a pain to sift through, not
+because etcd had a problem.
