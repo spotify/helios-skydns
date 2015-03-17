@@ -5,9 +5,21 @@
   <artifactId>helios-skydns</artifactId>
   <version>0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
-
   <name>helios-skydns</name>
+  <description>A Helios service registration plugin for SkyDNS</description>
   <url>https://github.com/spotify/helios-skydns</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+  </properties>
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
 
   <licenses>
     <license>
@@ -16,6 +28,20 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+  <scm>
+    <connection>scm:git:https://github.com/spotify/helios-skydns</connection>
+    <developerConnection>scm:git:git@github.com:spotify/helios-skydns</developerConnection>
+    <url>https://github.com/spotify/helios-skydns</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <developers>
     <developer>
@@ -53,18 +79,17 @@
       <name>Simon Cohen</name>
       <email>snc@spotify.com</email>
     </developer>
+    <developer>
+      <id>kobolog</id>
+      <name>Andrey Sibiryov</name>
+      <email>kobolog@spotify.com</email>
+    </developer>
+    <developer>
+      <id>davidxia</id>
+      <name>David Xia</name>
+      <email>dxia@spotify.com</email>
+    </developer>
   </developers>
-
-  <scm>
-    <connection>scm:git:https://github.com/spotify/helios.git</connection>
-    <developerConnection>scm:git:git@github.com:spotify/helios-skydns.git</developerConnection>
-    <tag>HEAD</tag>
-    <url>https://github.com/spotify/helios-skydns</url>
-  </scm>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -85,7 +110,7 @@
     <dependency>
       <groupId>com.spotify</groupId>
       <artifactId>helios-service-registration</artifactId>
-      <version>0.0.31</version>
+      <version>0.8.268</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -102,7 +127,7 @@
     <dependency>
       <groupId>com.spotify</groupId>
       <artifactId>helios-testing-common</artifactId>
-      <version>0.0.31</version>
+      <version>0.8.268</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -235,8 +260,6 @@
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5</version>
         <configuration>
-          <arguments>-DskipITs</arguments>
-          <pushChanges>false</pushChanges>
           <tagNameFormat>@{project.version}</tagNameFormat>
         </configuration>
         <dependencies>
@@ -246,6 +269,17 @@
             <version>1.9</version>
           </dependency>
         </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.4</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>${autoReleaseAfterClose}</autoReleaseAfterClose>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
