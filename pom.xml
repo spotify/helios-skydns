@@ -3,7 +3,7 @@
 
   <groupId>com.spotify</groupId>
   <artifactId>helios-skydns</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.2</version>
   <packaging>jar</packaging>
   <name>helios-skydns</name>
   <description>A Helios service registration plugin for SkyDNS</description>
@@ -33,7 +33,7 @@
     <connection>scm:git:https://github.com/spotify/helios-skydns</connection>
     <developerConnection>scm:git:git@github.com:spotify/helios-skydns</developerConnection>
     <url>https://github.com/spotify/helios-skydns</url>
-    <tag>HEAD</tag>
+    <tag>0.2</tag>
   </scm>
 
   <distributionManagement>
