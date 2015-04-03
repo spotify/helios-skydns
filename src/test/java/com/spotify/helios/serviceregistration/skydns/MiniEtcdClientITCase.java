@@ -21,27 +21,27 @@
 
 package com.spotify.helios.serviceregistration.skydns;
 
-import com.spotify.helios.serviceregistration.skydns.EtcdResponse;
-import com.spotify.helios.serviceregistration.skydns.MiniEtcdClient;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.junit.Test;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.junit.Assert.assertEquals;
 
 public class MiniEtcdClientITCase {
   @Test
   public void test() throws Exception {
     String etcdServer = System.getenv("ETCD_SERVER");
-    MiniEtcdClient client = new MiniEtcdClient(
-        (etcdServer != null ? etcdServer : "http://192.168.33.10:4001") + "/v2/keys/", 10000, 10000, 10000);
+    if (isNullOrEmpty(etcdServer)) {
+      etcdServer = "http://localhost:4001";
+    }
+    final MiniEtcdClient client = new MiniEtcdClient(etcdServer + "/v2/keys/", 10000, 10000, 10000);
     final String data = "DATA!";
     final String key = "KEY";
     client.set(key, data, null).get();
 
     final HttpResponse getResult = client.get(key).get();
-    EtcdResponse etc = client.getEtcdInfoFromResponse(getResult);
+    final EtcdResponse etc = client.getEtcdInfoFromResponse(getResult);
     assertEquals(data, etc.getNode().getValue());
 
     final HttpResponse delResult = client.delete(key).get();
