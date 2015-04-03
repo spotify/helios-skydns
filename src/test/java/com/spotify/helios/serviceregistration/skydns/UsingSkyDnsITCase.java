@@ -41,16 +41,18 @@ import org.xbill.DNS.TextParseException;
 import java.net.UnknownHostException;
 import java.util.concurrent.Callable;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UsingSkyDnsITCase {
   private static final int TTL = 300;
-  private static final String NORMAL_HOSTNAME_LOOKUP = "helios.http.skydns.local";
-  private static final String HOSTNAME = "myhostname.skydns.local";
+  private static final String DOMAIN = getEnv("SKYDNS_DOMAIN", "skydns.local");
+  private static final String NORMAL_HOSTNAME_LOOKUP = "helios.http." + DOMAIN;
+  private static final String HOSTNAME = "myhostname." + DOMAIN;
   final ImmutableList<Endpoint> ENDPOINTS = ImmutableList.of(
-      new ServiceRegistration.Endpoint("helios", "http", 4242, "skydns.local", HOSTNAME));
+      new ServiceRegistration.Endpoint("helios", "http", 4242, DOMAIN, HOSTNAME));
 
   @Test
   public void test() throws Exception {
@@ -93,28 +95,29 @@ public class UsingSkyDnsITCase {
   }
 
   private SimpleResolver getResolver() throws UnknownHostException {
-    final String skyDnsAddress = System.getenv("SKYDNS_SERVER");
-    final SimpleResolver resolver = new SimpleResolver(
-        skyDnsAddress != null ? skyDnsAddress : "192.168.33.10");
+    final String skyDnsAddress = getEnv("SKYDNS_SERVER", "localhost");
+    final SimpleResolver resolver = new SimpleResolver(skyDnsAddress);
     final String skyDnsPort = System.getenv("SKYDNS_PORT");
-    resolver.setPort(skyDnsPort != null ? Integer.parseInt(skyDnsPort) : 53);
+    resolver.setPort(isNullOrEmpty(skyDnsPort) ? 53 : Integer.parseInt(skyDnsPort));
     return resolver;
   }
 
   private ServiceRegistrar getRegistrar() {
-    final String etcdServer = System.getenv("ETCD_SERVER");
-    final ServiceRegistrar registrar = new SkyDnsServiceRegistrarFactory(TTL)
-        .create((etcdServer != null ? etcdServer : "http://192.168.33.10:4001"));
-    return registrar;
+    final String etcdServer = getEnv("ETCD_SERVER", "http://localhost:4001");
+    return new SkyDnsServiceRegistrarFactory(TTL).create(etcdServer);
   }
 
   private Lookup doLookup(final SimpleResolver resolver, String hostname)
       throws TextParseException {
     final Cache cache = new Cache();
-    final Lookup lookup = new Lookup(new Name(hostname),
-        org.xbill.DNS.Type.SRV);
+    final Lookup lookup = new Lookup(new Name(hostname), org.xbill.DNS.Type.SRV);
     lookup.setResolver(resolver);
     lookup.setCache(cache);
     return lookup;
+  }
+
+  private static String getEnv(String key, String defaultValue) {
+    final String value = System.getenv(key);
+    return isNullOrEmpty(value) ? defaultValue : value;
   }
 }
